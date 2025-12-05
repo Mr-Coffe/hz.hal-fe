@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZAMANIN ÖTESİNDE - Hz.Bora.Efendi</title>
+    <style>
+        /* --- Temel Stil ve Tema --- */
+        body {
+            background-color: #1a1a1a; /* Koyu tema */
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 50px;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1100px;
+            text-align: center;
+        }
+
+        /* --- Başlık Alanı --- */
+        header { margin-bottom: 40px; }
+        header h1 {
+            font-size: 3em;
+            letter-spacing: 8px;
+            font-weight: 300;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+        header p {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #a0a0a0;
+        }
+        .quote {
+            font-style: italic;
+            margin: 20px auto;
+            max-width: 600px;
+            line-height: 1.5;
+        }
+        .highlight-name {
+            color: #ff69b4; /* Pembe vurgu */
+            font-weight: bold;
+            font-size: 1.2em;
+            display: block;
+            margin-top: 15px;
+        }
+
+        /* --- Kalp ve Saat Alanı --- */
+        .hearts-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+            margin: 40px 0;
+        }
+
+        /* Canvas Konteynerleri */
+        .heart-wrapper {
+            width: 280px;
+            height: 280px;
+            border-radius: 15px;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000000;
+        }
+        
+        canvas {
+            display: block;
+            background-color: #000000;
+        }
+
+        /* --- Analog Saat --- */
+        .clock {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid #6A5ACD; /* Mavi-mor çerçeve */
+            background-color: #101010;
+            position: relative;
+            box-shadow: 0 0 15px rgba(106, 90, 205, 0.7), inset 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+        .clock-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background-color: #6A5ACD;
+            border-radius: 50%;
+            z-index: 10;
+        }
+        .hand {
+            position: absolute;
+            width: 3px;
+            height: 50%;
+            top: 50%;
+            left: 50%;
+            transform-origin: top center;
+            background-color: #e0e0e0;
+            border-radius: 2px;
+        }
+        .hour { background-color: #FF69B4; height: 30%; margin-top: -30%; width: 5px; }
+        .minute { background-color: #1E90FF; height: 40%; margin-top: -40%; width: 4px; }
+        .second { background-color: #FF0000; height: 45%; margin-top: -45%; width: 2px; }
+        .clock-num { color: #a0a0a0; }
+
+        /* --- Sayaç Alanı --- */
+        .timer {
+            font-family: monospace;
+            font-size: 5em;
+            font-weight: 200;
+            margin: 20px 0 50px 0;
+            color: #ffffff;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        /* --- Bilgi Kartları --- */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            width: 100%;
+            margin-bottom: 50px;
+        }
+        .card {
+            background-color: #1e1e1e;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            text-align: left;
+            border: 1px solid #333;
+        }
+        .card-title {
+            font-size: 1.1em;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            color: #b0b0b0;
+        }
+        .card-title i {
+            margin-right: 10px;
+            font-size: 1.4em;
+            color: #ff69b4;
+        }
+        .card-date {
+            font-size: 1.6em;
+            font-weight: 600;
+            color: #ffffff;
+            line-height: 1.2;
+        }
+        .card-subtitle {
+            font-size: 0.9em;
+            color: #888888;
+            margin-top: 5px;
+        }
+        .time-elapsed-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .time-box {
+            background-color: #333333;
+            padding: 10px 5px;
+            border-radius: 5px;
+            text-align: center;
+            border: 1px solid #444;
+        }
+        .time-box span {
+            display: block;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #1e90ff; /* Lacivert sayı vurgusu */
+        }
+        .time-box small {
+            font-size: 0.75em;
+            color: #d0d0d0;
+            font-weight: 500;
+        }
+        .card-footer {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #a0a0a0;
+        }
+
+        @media (max-width: 800px) {
+            .hearts-area {
+                flex-direction: column;
+                gap: 30px;
+            }
+            .info-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>ZAMANIN ÖTESİNDE</h1>
+            <p>Anılarımız Sonsuzluğa Uzanır</p>
+            <div class="quote">
+                Nice mutlu yıllara! Umarım önündeki yıllarda multanarak artar, doğrum, doğru ve yetişknilik günn kutlu olsun.
+                <span class="highlight-name">Hz.Bora.Efendi</span>
+            </div>
+        </header>
+
+        <section class="hearts-area">
+            <div class="heart-wrapper">
+                <canvas id="pinkHeartCanvas" width="250" height="250"></canvas>
+            </div>
+
+            <div class="clock" id="analogClock">
+                <div class="clock-num" style="position: absolute; top: 10%; left: 50%; transform: translate(-50%, -50%); font-size: 0.8em;">12</div>
+                <div class="clock-num" style="position: absolute; top: 50%; right: 10%; transform: translate(50%, -50%); font-size: 0.8em;">3</div>
+                <div class="clock-num" style="position: absolute; bottom: 10%; left: 50%; transform: translate(-50%, 50%); font-size: 0.8em;">6</div>
+                <div class="clock-num" style="position: absolute; top: 50%; left: 10%; transform: translate(-50%, -50%); font-size: 0.8em;">9</div>
+                <div class="hand hour" id="hourHand"></div>
+                <div class="hand minute" id="minuteHand"></div>
+                <div class="hand second" id="secondHand"></div>
+                <div class="clock-center"></div>
+            </div>
+
+            <div class="heart-wrapper">
+                <canvas id="blueHeartCanvas" width="250" height="250"></canvas>
+            </div>
+        </section>
+
+        <section class="timer" id="currentTimer">00:00:00</section>
+
+        <section class="info-cards">
+            <div class="card">
+                <div class="card-title"><i class="fas fa-handshake"></i> İLK TANIŞTIĞIMIZ GÜN</div>
+                <div class="card-date" id="firstDateDisplay">27 Mayıs 2025 00:00</div>
+                <div class="card-subtitle" id="firstDateElapsed">0 gün önce</div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fas fa-heart"></i> YENİDEN BİRLİKTE OLDUĞUMUZ GÜN</div>
+                <div class="card-date" id="reunionDateDisplay">14 Kasım 2025 00:00</div>
+                <div class="card-subtitle" id="reunionDateElapsed">0 gün önce</div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">İLK TANIŞTIĞIMIZ GÜN - GEÇEN SÜRE</div>
+                <div class="time-elapsed-grid">
+                    <div class="time-box"><small>GÜN</small><span id="firstDays">0</span></div>
+                    <div class="time-box"><small>SAAT</small><span id="firstHours">00</span></div>
+                    <div class="time-box"><small>DAKİTA</small><span id="firstMinutes">00</span></div>
+                    <div class="time-box"><small>SANİYE</small><span id="firstSeconds">00</span></div>
+                </div>
+                <div class="card-footer" id="firstDateFooter">PAZAR - 30 KASIM 2025 (Örnek)</div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">İLK TANIDAN BİRLİĞİMİZ GÜN - GEÇEN SÜRE</div>
+                <div class="time-elapsed-grid">
+                    <div class="time-box"><small>GÜN</small><span id="reunionDays">0</span></div>
+                    <div class="time-box"><small>SAAT</small><span id="reunionHours">00</span></div>
+                    <div class="time-box"><small>DAKİTA</small><span id="reunionMinutes">00</span></div>
+                    <div class="time-box"><small>SANİYE</small><span id="reunionSeconds">00</span></div>
+                </div>
+                <div class="card-footer" id="reunionDateFooter">PAZAR - 30 KASIM 2025 (Örnek)</div>
+            </div>
+        </section>
+    </div>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <script>
+        // /////////////////////////////////////////////////////////////////////////////////////
+        // 1. YAPILANDIRMA: TARİHLERİ BURADAN AYARLAYIN
+        // /////////////////////////////////////////////////////////////////////////////////////
+        // Not: 5 Aralık 2025'ten önce olduğu için sayaçlar "geçen süreyi" hesaplar.
+        const TARIH_BIRINCI = new Date('2025-05-27T00:00:00').getTime(); 
+        const TARIH_IKINCI = new Date('2025-11-14T00:00:00').getTime(); 
+        const CANVAS_SIZE = 250;
+        const SCALE = 8.5; 
+        const TOTAL_ITERATIONS = 2000; 
+        const PINK_COLOR = 'rgba(255, 20, 147, 0.9)'; 
+        const BLUE_COLOR = 'rgba(30, 144, 255, 0.8)'; 
+
+        // Tarih formatlama
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            const options = { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+            // toLocaleDateString'den gelen virgülü kaldırır
+            return date.toLocaleDateString('tr-TR', options).replace(',', '') + ' ' + date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // /////////////////////////////////////////////////////////////////////////////////////
+        // 2. PARAMETRİK KALP ÇİZİMİ (Canvas)
+        // /////////////////////////////////////////////////////////////////////////////////////
+
+        // Parametrik Kalp Denklemi X koordinatı
+        function xt(t) {
+            return 16 * Math.pow(Math.sin(t), 3);
+        }
+
+        // Parametrik Kalp Denklemi Y koordinatı
+        function yt(t) {
+            return 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+        }
+
+        // Kalbi Çizme Fonksiyonu
+        function drawHeartRays(canvasId, color) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = CANVAS_SIZE;
+            canvas.height = CANVAS_SIZE;
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            let i = 0;
+            
+            function drawFrame() {
+                if (i >= TOTAL_ITERATIONS) {
+                    return; 
+                }
+
+                // t değerini -PI/2 'den 3*PI/2 'ye kadar döngüye al
+                const t = (i / TOTAL_ITERATIONS) * (2 * Math.PI) - (Math.PI / 2); 
+                
+                const x = xt(t) * SCALE;
+                const y = yt(t) * SCALE;
+
+                ctx.beginPath();
+                // Çizimin merkezini kalp şeklinin alt kısmına yakın ayarla
+                ctx.moveTo(centerX, centerY + (CANVAS_SIZE * 0.1)); 
+                ctx.lineTo(centerX + x, centerY - y);
+                
+                // Opaklık çizgilerin merkezden dışa doğru saçılması efektini artırır.
+                ctx.strokeStyle = color.replace('0.9', (i / TOTAL_ITERATIONS) * 0.8 + 0.1); 
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                i += 10; // Çizim hızını artır
+                requestAnimationFrame(drawFrame);
+            }
+
+            drawFrame();
+        }
+
+        // Kalp çizimlerini başlat
+        drawHeartRays('pinkHeartCanvas', PINK_COLOR);
+        drawHeartRays('blueHeartCanvas', BLUE_COLOR);
+
+
+        // /////////////////////////////////////////////////////////////////////////////////////
+        // 3. ZAMAN VE SAYAÇ GÜNCELLEME
+        // /////////////////////////////////////////////////////////////////////////////////////
+        function updateTime() {
+            const now = new Date();
+            const nowTime = now.getTime();
+
+            // A. Genel Sayaç (Anlık Saat)
+            const timerHours = String(now.getHours()).padStart(2, '0');
+            const timerMinutes = String(now.getMinutes()).padStart(2, '0');
+            const timerSeconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('currentTimer').textContent = `${timerHours}:${timerMinutes}:${timerSeconds}`;
+
+            // B. Analog Saat Güncelleme
+            const seconds = now.getSeconds();
+            const minutes = now.getMinutes();
+            const hours = now.getHours();
+
+            // Derece Hesaplamaları (Hassas Dönüş)
+            const sDeg = (seconds / 60) * 360;
+            const mDeg = (minutes / 60) * 360 + (seconds / 60) * 6;
+            const hDeg = (hours % 12 / 12) * 360 + (minutes / 60) * 30;
+
+            document.getElementById('secondHand').style.transform = `translate(-50%, 0) rotate(${sDeg}deg)`;
+            document.getElementById('minuteHand').style.transform = `translate(-50%, 0) rotate(${mDeg}deg)`;
+            document.getElementById('hourHand').style.transform = `translate(-50%, 0) rotate(${hDeg}deg)`;
+
+
+            // C. Geçen Süre Hesaplama ve Güncelleme
+            const calculateAndDisplayTime = (targetTime, prefix) => {
+                const elapsedMs = nowTime - targetTime;
+                
+                if (elapsedMs < 0) {
+                    // Gelecek Tarih durumu
+                    const daysRemaining = Math.ceil(Math.abs(elapsedMs) / (1000 * 3600 * 24));
+                    document.getElementById(`${prefix}DateElapsed`).textContent = `Henüz ${daysRemaining} gün kaldı`;
+                    document.getElementById(`${prefix}Days`).textContent = daysRemaining;
+                    document.getElementById(`${prefix}Hours`).textContent = '00';
+                    document.getElementById(`${prefix}Minutes`).textContent = '00';
+                    document.getElementById(`${prefix}Seconds`).textContent = '00';
+                    return;
+                }
+
+                // Geçmiş Tarih (Geçen Süre)
+                const totalSeconds = Math.floor(elapsedMs / 1000);
+
+                const days = Math.floor(totalSeconds / (3600 * 24));
+                const remainingSeconds = totalSeconds % (3600 * 24);
+
+                const hours = String(Math.floor(remainingSeconds / 3600)).padStart(2, '0');
+                const minutes = String(Math.floor((remainingSeconds % 3600) / 60)).padStart(2, '0');
+                const seconds = String(remainingSeconds % 60).padStart(2, '0');
+
+                // Geçen Süre Kartları
+                document.getElementById(`${prefix}Days`).textContent = days;
+                document.getElementById(`${prefix}Hours`).textContent = hours;
+                document.getElementById(`${prefix}Minutes`).textContent = minutes;
+                document.getElementById(`${prefix}Seconds`).textContent = seconds;
+
+                // Özet Kart Alt Yazıları
+                document.getElementById(`${prefix}DateElapsed`).textContent = `${days} gün önce`;
+            };
+
+            calculateAndDisplayTime(TARIH_BIRINCI, 'first');
+            calculateAndDisplayTime(TARIH_IKINCI, 'reunion');
+        }
+
+        // D. İlk Yükleme ve Sürekli Güncelleme
+        // Tarihleri başlık kartlarına yerleştir
+        document.getElementById('firstDateDisplay').textContent = formatDate(TARIH_BIRINCI);
+        document.getElementById('reunionDateDisplay').textContent = formatDate(TARIH_IKINCI);
+
+        // Zamanı Başlat
+        updateTime();
+        setInterval(updateTime, 1000);
+    </script>
+</body>
+</html>
